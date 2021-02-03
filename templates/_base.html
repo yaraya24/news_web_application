@@ -19,15 +19,18 @@
         <div>
           <div class="d-flex collapse navbar-collapse pull-right" id="navbarTogglerDemo03">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+            {% if user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Log In</a>
+                <a class="nav-link active" aria-current="page" href="{% url 'account_logout' %}">Log out</a>
+              </li>
+              {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'account_login' %}">Log In</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Sign Up</a>
+                <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-              </li>
+            {% endif %}
             </ul>
           </div>
         </div>
