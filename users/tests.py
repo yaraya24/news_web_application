@@ -53,11 +53,28 @@ class SignupPageTests(TestCase):
             'email': self.email,
             'password1': self.password,
             'password2': self.password
-        })
-        
-        self.assertEqual(response.status_code, 302) # redirects to home page
+        })        
+        self.assertEqual(response.status_code, 302) 
         self.assertRedirects(response, reverse('home'), status_code=302, target_status_code=200)
         users = get_user_model().objects.all()
         self.assertEqual(users.count(), 1)
         self.assertEqual(get_user_model().objects.all()[0].username, self.username)
         self.assertEqual(get_user_model().objects.all()[0].email, self.email)
+
+        form_data = {
+            'username': self.username,
+            'email': self.email,
+            'password1': self.password,
+            'password2': self.password
+        }
+        form = CustomUserCreationForm(form_data)
+        self.assertFalse(form.is_valid())
+        form_data = {
+            'username': 'testuser2',
+            'email': 'test2@test.com',
+            'password1': self.password,
+            'password2': self.password
+        }
+        form = CustomUserCreationForm(form_data)
+        self.assertTrue(form.is_valid())
+        
