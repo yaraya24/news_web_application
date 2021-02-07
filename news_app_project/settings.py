@@ -136,6 +136,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS=[os.path.join(BASE_DIR,'static'),] # for local development
+STATIC_ROOT=os.path.join(BASE_DIR,'staticfiles') # for production
 
 AUTH_USER_MODEL = 'users.CustomUser'
 CRISPY_TEMPLATE_PACK='bootstrap4'
@@ -153,3 +155,4 @@ LOGOUT_REDIRECT_URL='home'
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_AUTHENTICATION_METHOD = "email"

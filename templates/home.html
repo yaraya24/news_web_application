@@ -1,7 +1,7 @@
 {% extends '_base.html' %}
 
 
-{% block title %}Home{% endblock title %}   
+{% block title %}Home{% endblock title %}
 
 {% block content %}
 <h1> Homepage </h1>
@@ -11,4 +11,25 @@
 <p>You are not logged in</p>
 <a href="{% url 'account_login' %}">Log In</a>
 {% endif %}
+{% for article in object_list %}
+<ul class="list-group">
+
+    <li class="list-group-item list-group-item-light" id="list_article">
+        <div class="left-pane">
+            <p>{{article.published_date}}</p>
+            <h5><a class="h1-a" href="{{article.article_address}}">{{article.heading}}</a></h5>
+            <div class='inner-top-pane'>
+                <p class="news-source">{{article.news_organisation}}</p>
+                <p>{{article.author}}</p>
+            </div>
+            <p>{{article.snippet}}</p>
+        </div>
+        <div class="right-pane">
+            <img src="{{article.image_source}}" class="" id="imgimg">
+        </div>
+    </li>
+
+</ul>
+{% endfor %}
+
 {% endblock content %}
