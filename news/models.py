@@ -15,9 +15,11 @@ class NewsArticle(models.Model):
     published_date = models.DateField()
     author = models.CharField(max_length=30, null=True)
     image_source = models.CharField(max_length=200, null=True, blank=True) 
+    category = models.CharField(max_length=50, default='general', null=True)
 
     class Meta:
         ordering = ['published_date']
 
     def __str__(self):
         return self.heading
+
