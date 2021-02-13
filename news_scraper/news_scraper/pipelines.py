@@ -26,9 +26,10 @@ class NewsScraperPipeline:
                             news_organisation=source, 
                             article_address=item['article_address'],
                             heading=item['heading'],
-                            snippet=item['snippet'],
+                            snippet=item['snippet'][:300] + '....',
                             author=item['author'],
                             image_source=item['image_source'],
+                            category = item['category']
                             )
                         article.save()
         
