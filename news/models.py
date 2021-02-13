@@ -9,12 +9,12 @@ class NewsOrganisation(models.Model):
 
 class NewsArticle(models.Model):
     news_organisation = models.ForeignKey(NewsOrganisation, on_delete=models.CASCADE)
-    article_address = models.CharField(max_length=200, unique=True)
-    heading = models.CharField(max_length=100)
+    article_address = models.CharField(max_length=300, unique=True)
+    heading = models.CharField(max_length=300)
     snippet = models.TextField()
-    published_date = models.DateField()
-    author = models.CharField(max_length=30, null=True)
-    image_source = models.CharField(max_length=200, null=True, blank=True) 
+    published_date = models.DateField(auto_now_add=True, blank=True)
+    author = models.CharField(max_length=100, null=True)
+    image_source = models.CharField(max_length=300, null=True, blank=True) 
     category = models.CharField(max_length=50, default='general', null=True)
 
     class Meta:

@@ -14,4 +14,4 @@ class NewsScraperItem(scrapy.Item):
     snippet = scrapy.Field()
     published_date = scrapy.Field()
     author = scrapy.Field()
-    image_url = scrapy.Field()
+    image_source = scrapy.Field()
