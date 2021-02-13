@@ -19,6 +19,9 @@ class NewsArticle(models.Model):
 
     class Meta:
         ordering = ['published_date']
+        indexes = [
+            models.Index(fields=['article_address'])
+        ]
 
     def __str__(self):
         return self.heading
