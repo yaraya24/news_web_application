@@ -23,10 +23,10 @@ class GuardianSpider(Spider):
             item["article_address"] = url
             if len(url) < 10 == False:
                 break
-            yield Request(url, callback = self.lol_article)
+            yield Request(url, callback = self.guardian_article)
 
     
-    def lol_article(self, response):
+    def guardian_article(self, response):
         item = NewsScraperItem()
         item['heading'] = response.xpath('//h1/text()').extract()[0].strip()
         item['article_address'] = response.url
