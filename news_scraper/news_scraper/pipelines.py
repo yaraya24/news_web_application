@@ -17,11 +17,7 @@ class NewsScraperPipeline:
 
         if len(item['heading']) > 5:
             if len(item['article_address']) > 5:
-                if len(item['snippet']) > 10:
-                    if len(item['author']) < 1:
-                        item['author'] = ''
-                    else:
-                        item['author'] = item['author'][0]      
+                if len(item['snippet']) > 10:  
                     try:
                         check_article = NewsArticle.objects.get(article_address=item['article_address'])
                         DropItem(item)
