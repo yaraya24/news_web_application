@@ -12,7 +12,7 @@ class NewsOrganisation(models.Model):
         return self.name
 
 class NewsArticle(models.Model):
-    news_organisation = models.ForeignKey(NewsOrganisation, on_delete=models.CASCADE)
+    news_organisation = models.ForeignKey(NewsOrganisation, on_delete=models.CASCADE, related_name='article')
     article_address = models.CharField(max_length=300, unique=True)
     heading = models.CharField(max_length=300)
     snippet = models.TextField()

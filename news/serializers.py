@@ -21,9 +21,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         if request:
             user = request.user
             if obj.likes.filter(id=user.id).first():
-                return user.username
+                return True
             else:
                 return False
         else:
-            return 'None'
+            return None
    
