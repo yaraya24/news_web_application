@@ -7,7 +7,7 @@ from .views import HomePageView
 from .models import NewsArticle, NewsOrganisation
 from django.contrib.auth import get_user_model, get_user
 from rest_framework.test import APIClient, force_authenticate, APIRequestFactory
-from .views import ArticlesList, ProfileView
+from .views import ArticlesList, ProfileView, ArticleDetailView
 
 
 class ArticleListTests(TestCase):
@@ -96,10 +96,39 @@ class ArticleListTests(TestCase):
         self.assertEqual(view_response[0]["liked_by_user"], True)
         self.assertEqual(view_response[0]["liked_count"], 2)
 
+    
+    def test_profile_page_permissions(self):
+        view = ProfileView.as_view()
+        request = self.factory.get("/api/v1/profile/")
+        response = view(request, username=self.test_user.username)
+        response.render()
+        self.assertEqual(response.status_code, 403)
+
+        request = self.factory.get("/api/v1/profile/")
+        force_authenticate(request, user=self.test_user)
+        response = view(request, username=self.test_user.username)
+        response.render()
+        self.assertEqual(response.status_code, 200)
+
+        test_user2 = get_user_model().objects.create(
+            username="test_user2",
+            password="Testpassword123",
+            email="test2@test.com",
+        )
+        request = self.factory.get("/api/v1/profile/")
+        force_authenticate(request, user=test_user2)
+        response = view(request, username=self.test_user.username)
+        response.render()
+        self.assertEqual(response.status_code, 403)
+
+
+
+
     def test_profile_page(self):
         view = ProfileView.as_view()
         username = self.test_user.username 
         request = self.factory.get("/api/v1/profile/")
+        force_authenticate(request, user=self.test_user)
         response = view(request, username=username)
         response.render()
         view_response = json.loads(response.content)
@@ -107,6 +136,34 @@ class ArticleListTests(TestCase):
         self.assertEqual(view_response["email"], self.test_user.email)
         self.assertEqual(len(view_response["following"]), 1)
         self.assertEqual(view_response["following"][0]['name'], self.news1.name)
+
+    def test_like_function(self):
+        view = ArticleDetailView.as_view()
+        request = self.factory.get("/api/v1/")
+        force_authenticate(request, user=self.test_user)
+        response = view(request, pk=self.article1.id)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(view_response["liked_by_user"], True)
+        self.assertEqual(view_response["liked_count"], 1)
+        
+        request = self.factory.patch("/api/v1/", {'like': 'Y'})
+        force_authenticate(request, user=self.test_user)
+        response = view(request, pk=self.article1.id)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(view_response["liked_by_user"], False)
+        self.assertEqual(view_response["liked_count"], 0)
+
+        request = self.factory.patch("/api/v1/", {'like': 'Y'})
+        force_authenticate(request, user=self.test_user)
+        response = view(request, pk=self.article1.id)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(view_response["liked_by_user"], True)
+        self.assertEqual(view_response["liked_count"], 1)
+
+
 
 
 
