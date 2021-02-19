@@ -25,7 +25,8 @@ class ArticleSerializer(serializers.ModelSerializer):
                 return False
         else:
             return None
-   
+
+
 
 
 class ProfilePageFollowedNews(serializers.ModelSerializer):
@@ -39,3 +40,4 @@ class ProfilePageSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('username', 'email', 'following')
+
