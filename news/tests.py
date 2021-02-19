@@ -7,7 +7,7 @@ from .views import HomePageView
 from .models import NewsArticle, NewsOrganisation
 from django.contrib.auth import get_user_model, get_user
 from rest_framework.test import APIClient, force_authenticate, APIRequestFactory
-from .views import ArticlesList
+from .views import ArticlesList, ProfileView
 
 
 class ArticleListTests(TestCase):
@@ -32,6 +32,7 @@ class ArticleListTests(TestCase):
             category="Politics",
         )
         self.test_user.likes.add(self.article1)
+        self.test_user.following.add(self.news1)
 
         self.client = APIClient()
         self.factory = APIRequestFactory()
@@ -94,5 +95,19 @@ class ArticleListTests(TestCase):
         view_response = json.loads(response.content)
         self.assertEqual(view_response[0]["liked_by_user"], True)
         self.assertEqual(view_response[0]["liked_count"], 2)
+
+    def test_profile_page(self):
+        view = ProfileView.as_view()
+        username = self.test_user.username 
+        request = self.factory.get("/api/v1/profile/")
+        response = view(request, username=username)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(view_response["username"], self.test_user.username)
+        self.assertEqual(view_response["email"], self.test_user.email)
+        self.assertEqual(len(view_response["following"]), 1)
+        self.assertEqual(view_response["following"][0]['name'], self.news1.name)
+
+
 
 
