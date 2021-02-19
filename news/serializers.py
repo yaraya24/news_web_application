@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from .models import NewsArticle
-
+from django.contrib.auth import get_user_model
+from .models import NewsArticle, NewsOrganisation
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -12,9 +12,8 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = NewsArticle
         
     def get_liked_count(self, obj):
-        qset = obj.likes.count()
-        
-        return qset
+        return obj.likes.count()
+
 
     def get_liked_by_user(self, obj):
         request = self.context.get('request', None)
@@ -27,3 +26,16 @@ class ArticleSerializer(serializers.ModelSerializer):
         else:
             return None
    
+
+
+class ProfilePageFollowedNews(serializers.ModelSerializer):
+    class Meta:
+        model = NewsOrganisation
+        fields = ['name']
+
+class ProfilePageSerializer(serializers.ModelSerializer):
+    following = ProfilePageFollowedNews(many=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ('username', 'email', 'following')
