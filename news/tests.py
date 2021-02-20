@@ -99,27 +99,30 @@ class ArticleListTests(TestCase):
     
     def test_profile_page_permissions(self):
         view = ProfileView.as_view()
-        request = self.factory.get("/api/v1/profile/")
-        response = view(request, username=self.test_user.username)
+        request = self.factory.get("/api/v1/profile")
+        response = view(request)
         response.render()
         self.assertEqual(response.status_code, 403)
 
         request = self.factory.get("/api/v1/profile/")
         force_authenticate(request, user=self.test_user)
-        response = view(request, username=self.test_user.username)
+        response = view(request)
         response.render()
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.test_user.username)
 
         test_user2 = get_user_model().objects.create(
-            username="test_user2",
+            username="django_user2",
             password="Testpassword123",
             email="test2@test.com",
         )
         request = self.factory.get("/api/v1/profile/")
         force_authenticate(request, user=test_user2)
-        response = view(request, username=self.test_user.username)
+        response = view(request)
         response.render()
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, test_user2.username)
+        self.assertNotContains(response, self.test_user.username)
 
 
 

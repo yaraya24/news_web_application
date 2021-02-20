@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.contrib.auth import get_user_model
 from .models import NewsArticle
 
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, exceptions
 from .models import NewsArticle, NewsOrganisation
 from .serializers import ArticleSerializer, ProfilePageSerializer
 from .permissions import IsAuthorizedUser
@@ -36,7 +36,23 @@ class ArticleDetailView(generics.RetrieveUpdateAPIView):
 
 
 class ProfileView(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsAuthorizedUser,)
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ProfilePageSerializer
-    queryset = get_user_model().objects.all()
-    lookup_field = 'username'
+    
+    
+
+    def get_object(self):
+        """
+        Returns the object the view is displaying.
+        You may want to override this if you need to provide non-standard
+        queryset lookups.  Eg if objects are referenced using multiple
+        keyword arguments in the url conf.
+        """
+        obj = get_object_or_404(get_user_model(), username=self.request.user.username)
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+    
