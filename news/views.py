@@ -66,4 +66,25 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
         return obj
 
+    def patch(self, request, *args, **kwargs):
+        NewsOrgs = NewsOrganisation.objects.all()
+        instance = self.get_object() # current logged in user 
+        news_follow_status = False
+        for newsorg in NewsOrgs:  
+            if request.data.get(newsorg.name):
+                if instance.follow_news_org.filter(name=newsorg.name).first():
+                    news_follow_status = True
+                if news_follow_status:
+                    instance.follow_news_org.remove(newsorg)
+                    instance.save()
+                else:
+                    instance.follow_news_org.add(newsorg)
+                    instance.save()
+        return self.retrieve(request, *args, **kwargs)
+
+
+
+
+
+
     

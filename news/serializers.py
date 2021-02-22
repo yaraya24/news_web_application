@@ -47,9 +47,9 @@ class ProfilePageFollowedNews(serializers.ModelSerializer):
         fields = ['name']
 
 class ProfilePageSerializer(serializers.ModelSerializer):
-    following = ProfilePageFollowedNews(many=True, read_only=True)
+    follow_news_org = ProfilePageFollowedNews(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'following')
+        fields = ('username', 'email', 'follow_news_org')
 
