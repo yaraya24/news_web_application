@@ -2,8 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from django.contrib.auth import get_user_model
 from .models import NewsArticle
-
-from rest_framework import generics, permissions, exceptions
+from rest_framework.response import Response
+from rest_framework import generics, permissions, exceptions, status
 from .models import NewsArticle, NewsOrganisation
 from .serializers import ArticleSerializer, ProfilePageSerializer
 from .permissions import IsAuthorizedUser
@@ -82,6 +82,56 @@ class ProfileView(generics.RetrieveUpdateAPIView):
                     instance.save()
         return self.retrieve(request, *args, **kwargs)
 
+
+class SavedArticles(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.saves.all()
+
+class SavedArticleDetail(generics.RetrieveDestroyAPIView):
+    permission_classes = (permissions.IsAuthenticated, )
+    serializer_class = ArticleSerializer
+    
+
+    def get_object(self):
+        """
+        Returns the object the view is displaying.
+        You may want to override this if you need to provide non-standard
+        queryset lookups.  Eg if objects are referenced using multiple
+        keyword arguments in the url conf.
+        """
+        queryset = self.request.user.saves.all()
+
+        # Perform the lookup filtering.
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+
+        assert lookup_url_kwarg in self.kwargs, (
+            'Expected view %s to be called with a URL keyword argument '
+            'named "%s". Fix your URL conf, or set the `.lookup_field` '
+            'attribute on the view correctly.' %
+            (self.__class__.__name__, lookup_url_kwarg)
+        )
+
+        filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
+        obj = get_object_or_404(queryset, **filter_kwargs)
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+
+    def delete(self, request, *args, **kwargs):
+        try: 
+            user = self.request.user
+            instance = self.get_object()
+            user.saves.remove(instance)
+            user.saves()
+        except :
+            return Response('Saved article no longer exists', status.HTTP_204_NO_CONTENT)
 
 
 

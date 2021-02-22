@@ -7,6 +7,8 @@ class ArticleSerializer(serializers.ModelSerializer):
     liked_count = serializers.SerializerMethodField()
     liked_by_user = serializers.SerializerMethodField()
     saved_by_user = serializers.SerializerMethodField()
+    news_organisation = serializers.StringRelatedField()
+    category = serializers.StringRelatedField()
 
     class Meta:       
         fields = ('saved_by_user','liked_by_user','liked_count', 'id', 'news_organisation', 'article_address', 'heading', 'snippet', 'published_date', 'author', 'image_source', 'category')
