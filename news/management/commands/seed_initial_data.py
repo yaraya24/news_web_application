@@ -3,8 +3,10 @@ from news.models import NewsOrganisation, Category
 
 
 class Command(BaseCommand):
-    help = """Command that will seed the required intial data for 
-                the application including News Organisations and Categories"""
+    help =  """
+            Command that will seed the required intial data for 
+            the application including News Organisations and Categories
+            """
 
     def handle(self):
      
