@@ -40,7 +40,7 @@ class ArticleListTests(TestCase):
         )
         self.article1.save()
         self.test_user.likes.add(self.article1)
-        self.test_user.following.add(self.news1)
+        
        
         
 
@@ -134,9 +134,6 @@ class ArticleListTests(TestCase):
         self.assertContains(response, test_user2.username)
         self.assertNotContains(response, self.test_user.username)
 
-
-
-
     def test_profile_page(self):
         view = ProfileView.as_view()
         username = self.test_user.username 
@@ -147,8 +144,7 @@ class ArticleListTests(TestCase):
         view_response = json.loads(response.content)
         self.assertEqual(view_response["username"], self.test_user.username)
         self.assertEqual(view_response["email"], self.test_user.email)
-        self.assertEqual(len(view_response["following"]), 1)
-        self.assertEqual(view_response["following"][0]['name'], self.news1.name)
+        self.assertEqual(len(view_response["follow_news_org"]), 0)
 
     def test_like_function(self):
         view = ArticleDetailView.as_view()
@@ -191,6 +187,24 @@ class ArticleListTests(TestCase):
         response.render()
         view_response = json.loads(response.content)
         self.assertEqual(view_response["saved_by_user"], True)
+
+    def test_following_news_org(self):
+        view = ProfileView.as_view()
+        request = self.factory.get("/api/v1/profile")
+        force_authenticate(request, user=self.test_user)
+        response = view(request)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(view_response["follow_news_org"], [])
+
+        request = self.factory.patch("/api/v1/profile", {self.news1.name: 'Y'})
+        force_authenticate(request, user=self.test_user)
+        response = view(request)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(len(view_response["follow_news_org"]), 1)
+        self.assertEqual(view_response["follow_news_org"][0]["name"], self.news1.name)
+
 
 
         
