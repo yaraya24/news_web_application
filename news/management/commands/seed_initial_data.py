@@ -8,7 +8,7 @@ class Command(BaseCommand):
             the application including News Organisations and Categories
             """
 
-    def handle(self):
+    def handle(self, *args, **kwargs):
      
         categories = [
             'General',

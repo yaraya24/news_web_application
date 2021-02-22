@@ -4,7 +4,7 @@ from django.urls import reverse, resolve
 
 from .views import HomePageView
 
-from .models import NewsArticle, NewsOrganisation
+from .models import NewsArticle, NewsOrganisation, Category
 from django.contrib.auth import get_user_model, get_user
 from rest_framework.test import APIClient, force_authenticate, APIRequestFactory
 from .views import ArticlesList, ProfileView, ArticleDetailView
@@ -21,6 +21,10 @@ class ArticleListTests(TestCase):
         self.news1 = NewsOrganisation.objects.create(
             name="news1", domain="www.news1.com"
         )
+        
+        self.category = Category.objects.create(
+            name='Politics'
+        )
 
         self.article1 = NewsArticle.objects.create(
             news_organisation=self.news1,
@@ -29,7 +33,7 @@ class ArticleListTests(TestCase):
             snippet="test article as seen on test news1",
             author="journalist1",
             image_source="image.com",
-            category="Politics",
+            category=self.category,
         )
         self.test_user.likes.add(self.article1)
         self.test_user.following.add(self.news1)
@@ -45,7 +49,7 @@ class ArticleListTests(TestCase):
         self.assertEqual(test_article.snippet, "test article as seen on test news1")
         self.assertEqual(test_article.author, "journalist1")
         self.assertEqual(test_article.image_source, "image.com")
-        self.assertEqual(test_article.category, "Politics")
+        self.assertEqual(test_article.category.name, "Politics")
         self.assertEqual(
             test_article.likes.filter(username="test_user").first(), self.test_user
         )
