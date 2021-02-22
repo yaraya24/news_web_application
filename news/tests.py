@@ -7,7 +7,7 @@ from .views import HomePageView
 from .models import NewsArticle, NewsOrganisation, Category
 from django.contrib.auth import get_user_model, get_user
 from rest_framework.test import APIClient, force_authenticate, APIRequestFactory
-from .views import ArticlesList, ProfileView, ArticleDetailView
+from .views import ArticlesList, ProfileView, ArticleDetailView, SavedArticles, SavedArticleDetail
 
 
 class ArticleListTests(TestCase):
@@ -46,6 +46,15 @@ class ArticleListTests(TestCase):
 
         self.client = APIClient()
         self.factory = APIRequestFactory()
+
+    
+    def method_for_testing_views(self, view_to_test, endpoint):
+        view = view_to_test.as_view()
+        request = self.factory.get(endpoint)
+        force_authenticate(request, user=self.test_user)
+        response = view(request)
+        response.render()
+        return json.loads(response.content)
 
     def test_article(self):
 
@@ -189,21 +198,49 @@ class ArticleListTests(TestCase):
         self.assertEqual(view_response["saved_by_user"], True)
 
     def test_following_news_org(self):
-        view = ProfileView.as_view()
-        request = self.factory.get("/api/v1/profile")
-        force_authenticate(request, user=self.test_user)
-        response = view(request)
-        response.render()
-        view_response = json.loads(response.content)
+        view_response = self.method_for_testing_views(ProfileView, "/api/v1/profile")
         self.assertEqual(view_response["follow_news_org"], [])
-
+       
         request = self.factory.patch("/api/v1/profile", {self.news1.name: 'Y'})
         force_authenticate(request, user=self.test_user)
+        view = ProfileView.as_view()
         response = view(request)
         response.render()
         view_response = json.loads(response.content)
         self.assertEqual(len(view_response["follow_news_org"]), 1)
         self.assertEqual(view_response["follow_news_org"][0]["name"], self.news1.name)
+
+    def test_saved_articles_view(self):
+        self.test_user.saves.add(self.article1)
+        self.assertEqual(self.test_user.saves.filter(id=self.article1.id).first(), self.article1)
+        view_response = self.method_for_testing_views(SavedArticles, "/api/v1/saved")
+        self.assertEqual(len(view_response), 1)
+        self.assertEqual(view_response[0]['id'], self.article1.id)
+        self.assertEqual(view_response[0]['news_organisation'], self.news1.name)
+        self.assertEqual(view_response[0]['heading'], self.article1.heading)
+    
+    def test_remove_saved_article_view(self):
+        self.test_user.saves.add(self.article1)
+        self.assertEqual(self.test_user.saves.count(), 1)
+        self.assertEqual(self.test_user.saves.filter(id=self.article1.id).first(), self.article1)
+        request = self.factory.delete("/api/v1/saved/del/")
+        force_authenticate(request, user=self.test_user)
+        view = SavedArticleDetail.as_view()
+        response = view(request, pk=self.article1.id)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(self.test_user.saves.count(), 0)
+        self.assertFalse(self.test_user.saves.filter(id=self.article1.id).first(), self.article1)
+
+        """testind saved article view to ensure there are no saved articles"""
+        view_response = self.method_for_testing_views(SavedArticles, "/api/v1/saved")
+        self.assertEqual(len(view_response), 0)
+        
+
+
+
+
+
+
 
 
 
