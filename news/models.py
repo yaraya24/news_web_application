@@ -11,6 +11,9 @@ class NewsOrganisation(models.Model):
     def __str__(self):
         return self.name
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
 class NewsArticle(models.Model):
     news_organisation = models.ForeignKey(NewsOrganisation, on_delete=models.CASCADE, related_name='article')
     article_address = models.CharField(max_length=300, unique=True)
@@ -19,7 +22,8 @@ class NewsArticle(models.Model):
     published_date = models.DateField(auto_now_add=True, blank=True)
     author = models.CharField(max_length=100, null=True)
     image_source = models.CharField(max_length=300, null=True, blank=True) 
-    category = models.CharField(max_length=50, default='general', null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category')
+
 
     class Meta:
         ordering = ['published_date']
@@ -29,4 +33,6 @@ class NewsArticle(models.Model):
 
     def __str__(self):
         return self.heading
+
+
 
