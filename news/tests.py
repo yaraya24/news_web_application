@@ -18,13 +18,16 @@ class ArticleListTests(TestCase):
             password="Testpassword123",
             email="test@test.com",
         )
+        self.test_user.save()
         self.news1 = NewsOrganisation.objects.create(
             name="news1", domain="www.news1.com"
         )
+        self.news1.save()
         
         self.category = Category.objects.create(
             name='Politics'
         )
+        self.category.save()
 
         self.article1 = NewsArticle.objects.create(
             news_organisation=self.news1,
@@ -35,8 +38,11 @@ class ArticleListTests(TestCase):
             image_source="image.com",
             category=self.category,
         )
+        self.article1.save()
         self.test_user.likes.add(self.article1)
         self.test_user.following.add(self.news1)
+       
+        
 
         self.client = APIClient()
         self.factory = APIRequestFactory()
@@ -169,6 +175,26 @@ class ArticleListTests(TestCase):
         view_response = json.loads(response.content)
         self.assertEqual(view_response["liked_by_user"], True)
         self.assertEqual(view_response["liked_count"], 1)
+
+    def test_save_function(self):
+        view = ArticleDetailView.as_view()
+        request = self.factory.get("/api/v1/")
+        force_authenticate(request, user=self.test_user)
+        response = view(request, pk=self.article1.id)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(view_response["saved_by_user"], False)
+
+        request = self.factory.patch("/api/v1/", {'save': 'Y'})
+        force_authenticate(request, user=self.test_user)
+        response = view(request, pk=self.article1.id)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(view_response["saved_by_user"], True)
+
+
+        
+
 
 
 
