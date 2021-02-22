@@ -25,13 +25,24 @@ class ArticleDetailView(generics.RetrieveUpdateAPIView):
     def patch(self, request, *args, **kwargs):
         instance = self.get_object()
         like_status = False
+        save_status = False
         if request.data.get('like'):
             if instance.likes.filter(id=request.user.id).first():
                 like_status = True
             if like_status:
                 request.user.likes.remove(instance)
+                request.user.save()
             else:
                 request.user.likes.add(instance)
+                request.user.save()
+
+        if request.data.get('save'):
+            if instance.saves.filter(id=request.user.id).first():
+                save_status = True
+            if not save_status:
+                request.user.saves.add(instance)
+                request.user.save()
+
         return self.retrieve(request, *args, **kwargs)
 
 

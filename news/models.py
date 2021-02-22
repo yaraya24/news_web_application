@@ -14,6 +14,9 @@ class NewsOrganisation(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
+    def __str__(self):
+        return self.name
+
 class NewsArticle(models.Model):
     news_organisation = models.ForeignKey(NewsOrganisation, on_delete=models.CASCADE, related_name='article')
     article_address = models.CharField(max_length=300, unique=True)

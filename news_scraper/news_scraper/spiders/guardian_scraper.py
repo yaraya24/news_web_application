@@ -22,7 +22,7 @@ class GuardianSpider(Spider):
         articles = Selector(response).xpath('//div[@class="fc-item__header"]/h3')[:15]
         
         category = {
-            "https://www.theguardian.com/international": 'Headlines',
+            "https://www.theguardian.com/international": 'General',
             "https://www.theguardian.com/uk/culture": 'Culture',
             "https://www.theguardian.com/uk/sport" : 'Sports',
             "https://www.theguardian.com/uk/technology": 'Technology',

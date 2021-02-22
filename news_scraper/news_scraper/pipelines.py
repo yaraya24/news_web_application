@@ -7,13 +7,14 @@
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
-from news.models import NewsArticle, NewsOrganisation
+from news.models import NewsArticle, NewsOrganisation, Category
 
 
 class NewsScraperPipeline:
     def process_item(self, item, spider):
         
         source = NewsOrganisation.objects.get(name='The Guardian')
+        category = Category.objects.get(name=item['category'])
 
         if len(item['heading']) > 5:
             if len(item['article_address']) > 5:
@@ -29,7 +30,7 @@ class NewsScraperPipeline:
                             snippet=item['snippet'][:300] + '....',
                             author=item['author'],
                             image_source=item['image_source'],
-                            category = item['category']
+                            category = category
                             )
                         article.save()
         
