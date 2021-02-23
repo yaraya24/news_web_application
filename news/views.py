@@ -149,7 +149,20 @@ class SavedArticleDetail(generics.RetrieveDestroyAPIView):
             return Response('Saved article no longer exists', status.HTTP_204_NO_CONTENT)
 
 
+class UserFeed(generics.ListAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = ArticleSerializer
 
+    def get_queryset(self):
+        user = self.request.user
+        queryset = []
 
+        news_org_query = user.follow_news_org.all()
+        for news in news_org_query:
+            queryset += NewsArticle.objects.filter(news_organisation=news)
+        
+        Category_query = user.follow_category.all()
+        for category in Category_query:
+            queryset += NewsArticle.objects.filter(category=category)
 
-    
+        return queryset
