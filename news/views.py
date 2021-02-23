@@ -89,7 +89,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
             if request.data.get(category.name):
                 if instance.follow_category.filter(name=category.name).first():
                     category_follow_status = True
-                if news_follow_status:
+                if category_follow_status:
                     instance.follow_category.remove(category)
                     instance.save()
                 else:

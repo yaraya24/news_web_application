@@ -39,10 +39,7 @@ class ArticleListTests(TestCase):
             category=self.category,
         )
         self.article1.save()
-        self.test_user.likes.add(self.article1)
-        
-       
-        
+        self.test_user.likes.add(self.article1)       
 
         self.client = APIClient()
         self.factory = APIRequestFactory()
@@ -234,9 +231,44 @@ class ArticleListTests(TestCase):
         """testind saved article view to ensure there are no saved articles"""
         view_response = self.method_for_testing_views(SavedArticles, "/api/v1/saved")
         self.assertEqual(len(view_response), 0)
-        
+    
+    def test_follow_categories(self):
+        self.assertEqual(self.test_user.follow_category.count(), 0)
+        self.test_user.follow_category.add(self.category)
+        self.assertEqual(self.test_user.follow_category.count(), 1)
+        self.assertEqual(self.test_user.follow_category.filter(name='Politics').first(), self.category)
+        self.test_user.follow_category.remove(self.category)
+        self.assertEqual(self.test_user.follow_category.count(), 0)
+        self.assertFalse(self.test_user.follow_category.filter(name='Politics').first(), self.category)
 
+    def test_follow_categories_view(self):
+        self.assertEqual(self.test_user.follow_category.count(), 0)
+        view_response = self.method_for_testing_views(ProfileView, "/api/v1/profile")
+        self.assertEqual(view_response["follow_category"], [])
 
+        """Creating follow relationship for category via the view"""
+        request = self.factory.patch("/api/v1/profile", {self.category.name: 'Y'})
+        force_authenticate(request, user=self.test_user)
+        view = ProfileView.as_view()
+        response = view(request)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(len(view_response["follow_category"]), 1)
+        self.assertEqual(view_response["follow_category"][0]["name"], self.category.name)
+        self.assertEqual(self.test_user.follow_category.count(), 1)
+        self.assertEqual(self.test_user.follow_category.filter(name='Politics').first(), self.category)
+
+        """Removing follow relationship for category via the view"""
+        request = self.factory.patch("/api/v1/profile", {self.category.name: 'Y'})
+        force_authenticate(request, user=self.test_user)
+        view = ProfileView.as_view()
+        response = view(request)
+        response.render()
+        view_response = json.loads(response.content)
+        self.assertEqual(view_response["follow_category"], [])
+        self.assertEqual(len(view_response["follow_category"]), 0)
+        self.assertEqual(self.test_user.follow_category.count(), 0)
+        self.assertFalse(self.test_user.follow_category.filter(name='Politics').first(), self.category)
 
 
 
