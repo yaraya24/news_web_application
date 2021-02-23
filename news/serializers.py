@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import NewsArticle, NewsOrganisation
+from .models import NewsArticle, NewsOrganisation, Category
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -48,10 +48,16 @@ class ProfilePageFollowedNews(serializers.ModelSerializer):
         model = NewsOrganisation
         fields = ['name']
 
+class ProfilePageFollowedCategories(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields=['name']
+
 class ProfilePageSerializer(serializers.ModelSerializer):
     follow_news_org = ProfilePageFollowedNews(many=True, read_only=True)
+    follow_category = ProfilePageFollowedCategories(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'follow_news_org')
+        fields = ('username', 'email', 'follow_news_org', 'follow_category')
 

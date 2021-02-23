@@ -2,8 +2,6 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth import get_user_model
-
-
 from .forms import CustomUserCreationForm
 
 class SignupPageView(generic.CreateView):

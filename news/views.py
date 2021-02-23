@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from .models import NewsArticle
 from rest_framework.response import Response
 from rest_framework import generics, permissions, exceptions, status
-from .models import NewsArticle, NewsOrganisation
+from .models import NewsArticle, NewsOrganisation, Category
 from .serializers import ArticleSerializer, ProfilePageSerializer
 from .permissions import IsAuthorizedUser
 
@@ -67,9 +67,11 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return obj
 
     def patch(self, request, *args, **kwargs):
+        """ Adding news org to a users following relation"""
         NewsOrgs = NewsOrganisation.objects.all()
         instance = self.get_object() # current logged in user 
         news_follow_status = False
+        category_follow_status = False
         for newsorg in NewsOrgs:  
             if request.data.get(newsorg.name):
                 if instance.follow_news_org.filter(name=newsorg.name).first():
@@ -79,6 +81,19 @@ class ProfileView(generics.RetrieveUpdateAPIView):
                     instance.save()
                 else:
                     instance.follow_news_org.add(newsorg)
+                    instance.save()
+
+        """ Adding category to a users following relation"""
+        categories = Category.objects.all()
+        for category in categories:
+            if request.data.get(category.name):
+                if instance.follow_category.filter(name=category.name).first():
+                    category_follow_status = True
+                if news_follow_status:
+                    instance.follow_category.remove(category)
+                    instance.save()
+                else:
+                    instance.follow_category.add(category)
                     instance.save()
         return self.retrieve(request, *args, **kwargs)
 
