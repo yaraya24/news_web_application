@@ -165,4 +165,4 @@ class UserFeed(generics.ListAPIView):
         for category in Category_query:
             queryset += NewsArticle.objects.filter(category=category)
 
-        return queryset
+        return set(queryset)

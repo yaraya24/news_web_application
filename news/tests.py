@@ -7,7 +7,14 @@ from .views import HomePageView
 from .models import NewsArticle, NewsOrganisation, Category
 from django.contrib.auth import get_user_model, get_user
 from rest_framework.test import APIClient, force_authenticate, APIRequestFactory
-from .views import ArticlesList, ProfileView, ArticleDetailView, SavedArticles, SavedArticleDetail
+from .views import (
+    ArticlesList,
+    ProfileView,
+    ArticleDetailView,
+    SavedArticles,
+    SavedArticleDetail,
+    UserFeed
+)
 
 
 class ArticleListTests(TestCase):
@@ -23,10 +30,8 @@ class ArticleListTests(TestCase):
             name="news1", domain="www.news1.com"
         )
         self.news1.save()
-        
-        self.category = Category.objects.create(
-            name='Politics'
-        )
+
+        self.category = Category.objects.create(name="Politics")
         self.category.save()
 
         self.article1 = NewsArticle.objects.create(
@@ -39,12 +44,11 @@ class ArticleListTests(TestCase):
             category=self.category,
         )
         self.article1.save()
-        self.test_user.likes.add(self.article1)       
+        self.test_user.likes.add(self.article1)
 
         self.client = APIClient()
         self.factory = APIRequestFactory()
 
-    
     def method_for_testing_views(self, view_to_test, endpoint):
         view = view_to_test.as_view()
         request = self.factory.get(endpoint)
@@ -112,7 +116,6 @@ class ArticleListTests(TestCase):
         self.assertEqual(view_response[0]["liked_by_user"], True)
         self.assertEqual(view_response[0]["liked_count"], 2)
 
-    
     def test_profile_page_permissions(self):
         view = ProfileView.as_view()
         request = self.factory.get("/api/v1/profile")
@@ -142,7 +145,7 @@ class ArticleListTests(TestCase):
 
     def test_profile_page(self):
         view = ProfileView.as_view()
-        username = self.test_user.username 
+        username = self.test_user.username
         request = self.factory.get("/api/v1/profile/")
         force_authenticate(request, user=self.test_user)
         response = view(request, username=username)
@@ -161,8 +164,8 @@ class ArticleListTests(TestCase):
         view_response = json.loads(response.content)
         self.assertEqual(view_response["liked_by_user"], True)
         self.assertEqual(view_response["liked_count"], 1)
-        
-        request = self.factory.patch("/api/v1/", {'like': 'Y'})
+
+        request = self.factory.patch("/api/v1/", {"like": "Y"})
         force_authenticate(request, user=self.test_user)
         response = view(request, pk=self.article1.id)
         response.render()
@@ -170,7 +173,7 @@ class ArticleListTests(TestCase):
         self.assertEqual(view_response["liked_by_user"], False)
         self.assertEqual(view_response["liked_count"], 0)
 
-        request = self.factory.patch("/api/v1/", {'like': 'Y'})
+        request = self.factory.patch("/api/v1/", {"like": "Y"})
         force_authenticate(request, user=self.test_user)
         response = view(request, pk=self.article1.id)
         response.render()
@@ -187,7 +190,7 @@ class ArticleListTests(TestCase):
         view_response = json.loads(response.content)
         self.assertEqual(view_response["saved_by_user"], False)
 
-        request = self.factory.patch("/api/v1/", {'save': 'Y'})
+        request = self.factory.patch("/api/v1/", {"save": "Y"})
         force_authenticate(request, user=self.test_user)
         response = view(request, pk=self.article1.id)
         response.render()
@@ -197,8 +200,8 @@ class ArticleListTests(TestCase):
     def test_following_news_org(self):
         view_response = self.method_for_testing_views(ProfileView, "/api/v1/profile")
         self.assertEqual(view_response["follow_news_org"], [])
-       
-        request = self.factory.patch("/api/v1/profile", {self.news1.name: 'Y'})
+
+        request = self.factory.patch("/api/v1/profile", {self.news1.name: "Y"})
         force_authenticate(request, user=self.test_user)
         view = ProfileView.as_view()
         response = view(request)
@@ -209,37 +212,49 @@ class ArticleListTests(TestCase):
 
     def test_saved_articles_view(self):
         self.test_user.saves.add(self.article1)
-        self.assertEqual(self.test_user.saves.filter(id=self.article1.id).first(), self.article1)
+        self.assertEqual(
+            self.test_user.saves.filter(id=self.article1.id).first(), self.article1
+        )
         view_response = self.method_for_testing_views(SavedArticles, "/api/v1/saved")
         self.assertEqual(len(view_response), 1)
-        self.assertEqual(view_response[0]['id'], self.article1.id)
-        self.assertEqual(view_response[0]['news_organisation'], self.news1.name)
-        self.assertEqual(view_response[0]['heading'], self.article1.heading)
-    
+        self.assertEqual(view_response[0]["id"], self.article1.id)
+        self.assertEqual(view_response[0]["news_organisation"], self.news1.name)
+        self.assertEqual(view_response[0]["heading"], self.article1.heading)
+
     def test_remove_saved_article_view(self):
         self.test_user.saves.add(self.article1)
         self.assertEqual(self.test_user.saves.count(), 1)
-        self.assertEqual(self.test_user.saves.filter(id=self.article1.id).first(), self.article1)
+        self.assertEqual(
+            self.test_user.saves.filter(id=self.article1.id).first(), self.article1
+        )
         request = self.factory.delete("/api/v1/saved/del/")
         force_authenticate(request, user=self.test_user)
         view = SavedArticleDetail.as_view()
         response = view(request, pk=self.article1.id)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(self.test_user.saves.count(), 0)
-        self.assertFalse(self.test_user.saves.filter(id=self.article1.id).first(), self.article1)
+        self.assertFalse(
+            self.test_user.saves.filter(id=self.article1.id).first(), self.article1
+        )
 
         """testind saved article view to ensure there are no saved articles"""
         view_response = self.method_for_testing_views(SavedArticles, "/api/v1/saved")
         self.assertEqual(len(view_response), 0)
-    
+
     def test_follow_categories(self):
         self.assertEqual(self.test_user.follow_category.count(), 0)
         self.test_user.follow_category.add(self.category)
         self.assertEqual(self.test_user.follow_category.count(), 1)
-        self.assertEqual(self.test_user.follow_category.filter(name='Politics').first(), self.category)
+        self.assertEqual(
+            self.test_user.follow_category.filter(name="Politics").first(),
+            self.category,
+        )
         self.test_user.follow_category.remove(self.category)
         self.assertEqual(self.test_user.follow_category.count(), 0)
-        self.assertFalse(self.test_user.follow_category.filter(name='Politics').first(), self.category)
+        self.assertFalse(
+            self.test_user.follow_category.filter(name="Politics").first(),
+            self.category,
+        )
 
     def test_follow_categories_view(self):
         self.assertEqual(self.test_user.follow_category.count(), 0)
@@ -247,19 +262,24 @@ class ArticleListTests(TestCase):
         self.assertEqual(view_response["follow_category"], [])
 
         """Creating follow relationship for category via the view"""
-        request = self.factory.patch("/api/v1/profile", {self.category.name: 'Y'})
+        request = self.factory.patch("/api/v1/profile", {self.category.name: "Y"})
         force_authenticate(request, user=self.test_user)
         view = ProfileView.as_view()
         response = view(request)
         response.render()
         view_response = json.loads(response.content)
         self.assertEqual(len(view_response["follow_category"]), 1)
-        self.assertEqual(view_response["follow_category"][0]["name"], self.category.name)
+        self.assertEqual(
+            view_response["follow_category"][0]["name"], self.category.name
+        )
         self.assertEqual(self.test_user.follow_category.count(), 1)
-        self.assertEqual(self.test_user.follow_category.filter(name='Politics').first(), self.category)
+        self.assertEqual(
+            self.test_user.follow_category.filter(name="Politics").first(),
+            self.category,
+        )
 
         """Removing follow relationship for category via the view"""
-        request = self.factory.patch("/api/v1/profile", {self.category.name: 'Y'})
+        request = self.factory.patch("/api/v1/profile", {self.category.name: "Y"})
         force_authenticate(request, user=self.test_user)
         view = ProfileView.as_view()
         response = view(request)
@@ -268,19 +288,30 @@ class ArticleListTests(TestCase):
         self.assertEqual(view_response["follow_category"], [])
         self.assertEqual(len(view_response["follow_category"]), 0)
         self.assertEqual(self.test_user.follow_category.count(), 0)
-        self.assertFalse(self.test_user.follow_category.filter(name='Politics').first(), self.category)
+        self.assertFalse(
+            self.test_user.follow_category.filter(name="Politics").first(),
+            self.category,
+        )
 
+    def test_user_feed_view(self):
+        self.test_user.follow_category.add(self.category)
+        view_response = self.method_for_testing_views(UserFeed, "/api/v1/myfeed")
+        self.assertEqual(len(view_response), 1) 
+        self.assertEqual(view_response[0]['heading'], self.article1.heading)
+        category2 = Category.objects.create(name="Sports")
 
-
-
-
-
-
-        
-
-
-
-
-
-
-
+        article2 = NewsArticle.objects.create(
+            news_organisation=self.news1,
+            article_address="news1.com/article2",
+            heading="test headline for Sports",
+            snippet="test article as seen on test news1 with sports",
+            author="journalist1",
+            image_source="image.com",
+            category=category2,
+        )
+        view_response = self.method_for_testing_views(UserFeed, "/api/v1/myfeed")
+        self.assertEqual(len(view_response), 1) 
+        self.test_user.follow_category.add(category2)
+        view_response = self.method_for_testing_views(UserFeed, "/api/v1/myfeed")
+        self.assertEqual(len(view_response), 2) 
+        self.assertEqual(view_response[1]['heading'], article2.heading)
