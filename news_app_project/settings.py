@@ -44,6 +44,11 @@ INSTALLED_APPS = [
     "crispy_forms",
     "allauth",
     "allauth.account",
+    'rest_framework.authtoken',
+    'allauth.socialaccount',
+    'dj_rest_auth.registration',
+    'dj_rest_auth',
+
     # local apps
     "users.apps.UsersConfig",
     "news.apps.NewsConfig",
@@ -159,8 +164,9 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": (
+    "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
-    ),
+        "rest_framework.authentication.TokenAuthentication",
+    ],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }

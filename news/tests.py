@@ -13,7 +13,7 @@ from .views import (
     ArticleDetailView,
     SavedArticles,
     SavedArticleDetail,
-    UserFeed
+    UserFeed,
 )
 
 
@@ -296,8 +296,8 @@ class ArticleListTests(TestCase):
     def test_user_feed_view(self):
         self.test_user.follow_category.add(self.category)
         view_response = self.method_for_testing_views(UserFeed, "/api/v1/myfeed")
-        self.assertEqual(len(view_response), 1) 
-        self.assertEqual(view_response[0]['heading'], self.article1.heading)
+        self.assertEqual(len(view_response), 1)
+        self.assertEqual(view_response[0]["heading"], self.article1.heading)
         category2 = Category.objects.create(name="Sports")
 
         article2 = NewsArticle.objects.create(
@@ -310,8 +310,8 @@ class ArticleListTests(TestCase):
             category=category2,
         )
         view_response = self.method_for_testing_views(UserFeed, "/api/v1/myfeed")
-        self.assertEqual(len(view_response), 1) 
+        self.assertEqual(len(view_response), 1)
         self.test_user.follow_category.add(category2)
         view_response = self.method_for_testing_views(UserFeed, "/api/v1/myfeed")
-        self.assertEqual(len(view_response), 2) 
-        self.assertEqual(view_response[1]['heading'], article2.heading)
+        self.assertEqual(len(view_response), 2)
+        self.assertEqual(view_response[1]["heading"], article2.heading)
