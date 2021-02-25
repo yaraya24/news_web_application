@@ -1,8 +1,8 @@
 {
-    "python.pythonPath": "/home/yaraya24/.local/share/virtualenvs/web_news_app-BeWzrT8U/bin/python",
+    "python.pythonPath": "/home/yaraya24/.local/share/virtualenvs/backend-Z0JsMXBC/bin/python",
     "python.linting.pylintEnabled": false,
-    "python.linting.pylamaEnabled": false,
+    "python.linting.pylamaEnabled": true,
     "python.linting.enabled": true,
-    "python.linting.mypyEnabled": true,
+    "python.linting.mypyEnabled": false,
     "python.formatting.provider": "black"
 }

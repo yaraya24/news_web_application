@@ -5,11 +5,11 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Work directory
-WORKDIR /code
+WORKDIR /backend
 
 # Install dependencies
-COPY Pipfile Pipfile.lock /code/
+COPY Pipfile Pipfile.lock /backend/
 RUN pip install pipenv && pipenv install --system
 
 # Copy the project
-COPY . /code/
+COPY . /backend
