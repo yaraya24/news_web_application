@@ -26,16 +26,16 @@ SECRET_KEY = "=uho58mx@t1bp*ww993mqu%=4o8mj#5mr3hy0b#!f_h&m^g3kk"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    "backend",
-    "localhost"
-]
+ALLOWED_HOSTS = ["backend", "localhost"]
 
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:3000",
+    "http://localhost:8000",
+)
 
 # Application definition
 
 INSTALLED_APPS = [
-    "rest_framework",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,14 +44,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     # third party apps
+    "rest_framework",
     "crispy_forms",
     "allauth",
     "allauth.account",
-    'rest_framework.authtoken',
-    'allauth.socialaccount',
-    'dj_rest_auth.registration',
-    'dj_rest_auth',
-
+    "rest_framework.authtoken",
+    "allauth.socialaccount",
+    "dj_rest_auth.registration",
+    "dj_rest_auth",
+    "corsheaders",
     # local apps
     "users.apps.UsersConfig",
     "news.apps.NewsConfig",
@@ -60,6 +61,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
