@@ -11,14 +11,16 @@ from .permissions import IsAuthorizedUser
 
 class HomePageView(ListView):
     model = NewsArticle
-    template_name = 'home.html'
+    template_name = "home.html"
+
 
 class ArticlesList(generics.ListAPIView):
     queryset = NewsArticle.objects.all()
     serializer_class = ArticleSerializer
 
+
 class ArticleDetailView(generics.RetrieveUpdateAPIView):
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)
     queryset = NewsArticle.objects.all()
     serializer_class = ArticleSerializer
 
@@ -26,7 +28,7 @@ class ArticleDetailView(generics.RetrieveUpdateAPIView):
         instance = self.get_object()
         like_status = False
         save_status = False
-        if request.data.get('like'):
+        if request.data.get("like"):
             if instance.likes.filter(id=request.user.id).first():
                 like_status = True
             if like_status:
@@ -36,7 +38,7 @@ class ArticleDetailView(generics.RetrieveUpdateAPIView):
                 request.user.likes.add(instance)
                 request.user.save()
 
-        if request.data.get('save'):
+        if request.data.get("save"):
             if instance.saves.filter(id=request.user.id).first():
                 save_status = True
             if not save_status:
@@ -49,8 +51,6 @@ class ArticleDetailView(generics.RetrieveUpdateAPIView):
 class ProfileView(generics.RetrieveUpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ProfilePageSerializer
-    
-    
 
     def get_object(self):
         """
@@ -69,10 +69,10 @@ class ProfileView(generics.RetrieveUpdateAPIView):
     def patch(self, request, *args, **kwargs):
         """ Adding news org to a users following relation"""
         NewsOrgs = NewsOrganisation.objects.all()
-        instance = self.get_object() # current logged in user 
+        instance = self.get_object()  # current logged in user
         news_follow_status = False
         category_follow_status = False
-        for newsorg in NewsOrgs:  
+        for newsorg in NewsOrgs:
             if request.data.get(newsorg.name):
                 if instance.follow_news_org.filter(name=newsorg.name).first():
                     news_follow_status = True
@@ -106,10 +106,10 @@ class SavedArticles(generics.ListAPIView):
         user = self.request.user
         return user.saves.all()
 
+
 class SavedArticleDetail(generics.RetrieveDestroyAPIView):
-    permission_classes = (permissions.IsAuthenticated, )
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ArticleSerializer
-    
 
     def get_object(self):
         """
@@ -124,10 +124,10 @@ class SavedArticleDetail(generics.RetrieveDestroyAPIView):
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
 
         assert lookup_url_kwarg in self.kwargs, (
-            'Expected view %s to be called with a URL keyword argument '
+            "Expected view %s to be called with a URL keyword argument "
             'named "%s". Fix your URL conf, or set the `.lookup_field` '
-            'attribute on the view correctly.' %
-            (self.__class__.__name__, lookup_url_kwarg)
+            "attribute on the view correctly."
+            % (self.__class__.__name__, lookup_url_kwarg)
         )
 
         filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
@@ -138,15 +138,16 @@ class SavedArticleDetail(generics.RetrieveDestroyAPIView):
 
         return obj
 
-
     def delete(self, request, *args, **kwargs):
-        try: 
+        try:
             user = self.request.user
             instance = self.get_object()
             user.saves.remove(instance)
             user.saves()
-        except :
-            return Response('Saved article no longer exists', status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(
+                "Saved article no longer exists", status.HTTP_204_NO_CONTENT
+            )
 
 
 class UserFeed(generics.ListAPIView):
@@ -158,11 +159,11 @@ class UserFeed(generics.ListAPIView):
         queryset = []
 
         news_org_query = user.follow_news_org.all()
-        for news in news_org_query:
-            queryset += NewsArticle.objects.filter(news_organisation=news)
-        
-        Category_query = user.follow_category.all()
-        for category in Category_query:
-            queryset += NewsArticle.objects.filter(category=category)
+        news_queryset = NewsArticle.objects.filter(news_organisation__in=news_org_query)
 
-        return set(queryset)
+        category_query = user.follow_category.all()
+        category_queryset = NewsArticle.objects.filter(category__in=category_query)
+
+        queryset = news_queryset.union(category_queryset).order_by("-published_date")
+
+        return queryset

@@ -54,10 +54,29 @@ class ProfilePageFollowedCategories(serializers.ModelSerializer):
         fields=['name']
 
 class ProfilePageSerializer(serializers.ModelSerializer):
-    follow_news_org = ProfilePageFollowedNews(many=True, read_only=True)
-    follow_category = ProfilePageFollowedCategories(many=True, read_only=True)
+    follow_category_list = serializers.SerializerMethodField()
+    follow_news_org_list = serializers.SerializerMethodField()
+
+    
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'follow_news_org', 'follow_category')
+        fields = ('username', 'email', 'follow_news_org_list', 'follow_category_list')
 
+    def get_follow_category_list(self, obj):
+        request = self.context.get('request', None)
+        followed_categories = []
+        if request:
+            user = request.user
+            for cat in user.follow_category.all():
+                followed_categories.append(cat.name)
+        return followed_categories
+
+    def get_follow_news_org_list(self, obj):
+        request = self.context.get('request', None)
+        followed_news = []
+        if request:
+            user = request.user 
+            for org in user.follow_news_org.all():
+                followed_news.append(org.name)
+        return followed_news
