@@ -9,6 +9,7 @@ import scrapy
 class NewsScraperItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    source = scrapy.Field()
     heading = scrapy.Field()
     article_address = scrapy.Field()
     snippet = scrapy.Field()

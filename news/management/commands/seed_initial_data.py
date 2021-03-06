@@ -25,7 +25,16 @@ class Command(BaseCommand):
             {
                 'name' : 'The Conversation',
                 'domain' : 'www.theconversation.com/global'
-            }
+            },
+             {
+                'name' : 'NPR',
+                'domain' : 'www.npr.org'
+            },
+             {
+                'name' : 'Reuters',
+                'domain' : 'https://www.reuters.com'
+            },
+            
         ]
 
         for category in categories:
