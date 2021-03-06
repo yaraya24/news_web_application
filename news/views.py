@@ -167,3 +167,31 @@ class UserFeed(generics.ListAPIView):
         queryset = news_queryset.union(category_queryset).order_by("-published_date")
 
         return queryset
+
+class SportsView(generics.ListAPIView):
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        category = Category.objects.filter(name="Sports").first()
+        return NewsArticle.objects.filter(category=category).order_by("-published_date")
+
+class BusinessView(generics.ListAPIView):
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        category = Category.objects.filter(name="Business").first()
+        return NewsArticle.objects.filter(category=category).order_by("-published_date")
+
+class CultureView(generics.ListAPIView):
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        category = Category.objects.filter(name="Culture").first()
+        return NewsArticle.objects.filter(category=category).order_by("-published_date")
+
+class TechnologyView(generics.ListAPIView):
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        category = Category.objects.filter(name="Technology").first()
+        return NewsArticle.objects.filter(category=category).order_by("-published_date")
