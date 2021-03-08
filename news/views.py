@@ -15,8 +15,11 @@ class HomePageView(ListView):
 
 
 class ArticlesList(generics.ListAPIView):
-    queryset = NewsArticle.objects.all()
     serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        category = Category.objects.filter(name="General").first()
+        return NewsArticle.objects.filter(category=category).order_by("-published_date")
 
 
 class ArticleDetailView(generics.RetrieveUpdateAPIView):
