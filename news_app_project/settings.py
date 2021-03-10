@@ -26,11 +26,12 @@ SECRET_KEY = "=uho58mx@t1bp*ww993mqu%=4o8mj#5mr3hy0b#!f_h&m^g3kk"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["backend", "127.0.0.1", "frontend", "localhost"]
+ALLOWED_HOSTS = ["backend", "127.0.0.1", "frontend", "localhost", '0.0.0.0']
 
 CORS_ORIGIN_WHITELIST = (
     "http://localhost:3001",
     "http://localhost:8000",
+    "http://localhost"
 )
 
 # Application definition
@@ -168,7 +169,6 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.AllowAny",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.TokenAuthentication",
     ],
     "TEST_REQUEST_DEFAULT_FORMAT": "json",

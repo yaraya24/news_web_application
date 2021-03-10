@@ -8,8 +8,8 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /backend
 
 # Install dependencies
-COPY Pipfile Pipfile.lock /backend/
+COPY ./backend/Pipfile ./backend/Pipfile.lock /backend/
 RUN pip install pipenv && pipenv install --system
 
 # Copy the project
-COPY . /backend
+COPY ./backend /backend

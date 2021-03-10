@@ -16,6 +16,7 @@ class HomePageView(ListView):
 
 class ArticlesList(generics.ListAPIView):
     serializer_class = ArticleSerializer
+    permission_classes = (permissions.AllowAny, )
 
     def get_queryset(self):
         category = Category.objects.filter(name="General").first()

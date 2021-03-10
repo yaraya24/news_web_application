@@ -36,10 +36,12 @@ class Command(BaseCommand):
             },
             
         ]
+        try:
+            for category in categories:
+                Category.objects.create(name=category)
 
-        for category in categories:
-            Category.objects.create(name=category)
-
-        for News in NewsOrgs:
-            NewsOrganisation.objects.create(name=News['name'], domain=News['domain'])
+            for News in NewsOrgs:
+                NewsOrganisation.objects.create(name=News['name'], domain=News['domain'])
+        except:
+            print("database has already been populated")
 

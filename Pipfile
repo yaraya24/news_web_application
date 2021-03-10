@@ -12,6 +12,8 @@ scrapy = "*"
 djangorestframework = "*"
 dj-rest-auth = "*"
 django-cors-headers = "*"
+gunicorn = "*"
+django-environ = "*"
 
 [dev-packages]
 
