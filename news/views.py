@@ -3,7 +3,7 @@ from django.views.generic import ListView
 from django.contrib.auth import get_user_model
 from .models import NewsArticle
 from rest_framework.response import Response
-from rest_framework import generics, permissions, exceptions, status
+from rest_framework import generics, permissions, exceptions, status, filters
 from .models import NewsArticle, NewsOrganisation, Category
 from .serializers import ArticleSerializer, ProfilePageSerializer
 from .permissions import IsAuthorizedUser
@@ -199,3 +199,10 @@ class TechnologyView(generics.ListAPIView):
     def get_queryset(self):
         category = Category.objects.filter(name="Technology").first()
         return NewsArticle.objects.filter(category=category).order_by("-published_date")
+
+class SearchView(generics.ListAPIView):
+    serializer_class = ArticleSerializer
+    filter_backends = [filters.SearchFilter,]
+    search_fields = ['heading', 'snippet', 'author']
+    queryset = NewsArticle.objects.all()
+

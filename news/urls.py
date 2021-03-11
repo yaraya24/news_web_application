@@ -9,7 +9,8 @@ from .views import (
     SportsView,
     BusinessView,
     CultureView,
-    TechnologyView
+    TechnologyView,
+    SearchView
 )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path("business/", BusinessView.as_view(), name="business_view"),
     path("culture/", CultureView.as_view(), name="culture_view"),
     path("technology/", TechnologyView.as_view(), name="technology_view"),
+    path("search/", SearchView.as_view(), name="search_view")
 ]
