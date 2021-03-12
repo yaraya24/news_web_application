@@ -4,6 +4,7 @@ from news_scraper.items import NewsScraperItem
 
 
 class ReutersSpider(Spider):
+    """ Spider that will scrape for articles from Reuters"""
     name = "reuters_spider"
     start_urls = [
         "https://www.reuters.com/",
@@ -15,6 +16,7 @@ class ReutersSpider(Spider):
     custom_settings = {"DEPTH_LIMIT": 2}
 
     def parse(self, response):
+         """Method to parse articles using Xpaths"""
         articles = Selector(response).xpath('//div[@class="story-content"]')
         category = {
             "https://www.reuters.com/": "General",
@@ -32,6 +34,7 @@ class ReutersSpider(Spider):
             )
 
     def reuters_article(self, response):
+        """Call back method to create a News Article object based on scraped data"""
         item = NewsScraperItem()
         item['source'] = 'Reuters'
         item["category"] = response.meta.get("category")

@@ -3,6 +3,8 @@ from news.models import NewsOrganisation, Category
 
 
 class Command(BaseCommand):
+    """Class that will allow custom commands to populate the database using manage.py"""
+
     help =  """
             Command that will seed the required intial data for 
             the application including News Organisations and Categories

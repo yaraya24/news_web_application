@@ -4,8 +4,8 @@ from news_scraper.items import NewsScraperItem
 
 
 class ConversationSpider(Spider):
+    """ Spider that will scrape for articles from The Conversation"""
     name = 'conversation_spider'
-    # allowed_domains = ["www.theconversation.com"]
     start_urls = [
         "https://theconversation.com/us",
         "https://theconversation.com/us/arts",
@@ -17,6 +17,7 @@ class ConversationSpider(Spider):
     }
 
     def parse(self, response):
+        """Method to parse articles using Xpaths"""
         articles = Selector(response).xpath('//div[@class="article--header"]/h2')[:15]
 
         category = {
@@ -33,6 +34,7 @@ class ConversationSpider(Spider):
             yield Request(url, callback = self.conversation_article, meta={'category': category[response.url]})
 
     def conversation_article(self, response):
+        """Call back method to create a News Article object based on scraped data"""
         item = NewsScraperItem()
         item['source'] = "The Conversation"
         item['category'] = response.meta.get('category')

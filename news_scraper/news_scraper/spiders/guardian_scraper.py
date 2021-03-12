@@ -3,6 +3,7 @@ from scrapy.selector import Selector
 from news_scraper.items import NewsScraperItem
 
 class GuardianSpider(Spider):
+    """ Spider that will scrape for articles from The Guardian"""
     name = 'guardian_spider'
     
     start_urls = [
@@ -19,6 +20,7 @@ class GuardianSpider(Spider):
     
 
     def parse(self, response):
+        """Method to parse articles using Xpaths"""
         articles = Selector(response).xpath('//div[@class="fc-item__header"]/h3')
         
         category = {
@@ -37,6 +39,7 @@ class GuardianSpider(Spider):
 
     
     def guardian_article(self, response):
+        """Call back method to create a News Article object based on scraped data"""
         item = NewsScraperItem()
         item['source'] = "The Guardian"
         item['category'] = response.meta.get('category')

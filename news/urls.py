@@ -13,6 +13,8 @@ from .views import (
     SearchView
 )
 
+""" URLs for the API endpoints"""
+
 urlpatterns = [
     path("", ArticlesList.as_view(), name="home"),
     path("<int:pk>/", ArticleDetailView.as_view(), name="article_detail"),

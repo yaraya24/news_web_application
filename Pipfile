@@ -14,6 +14,7 @@ dj-rest-auth = "*"
 django-cors-headers = "*"
 gunicorn = "*"
 django-environ = "*"
+black = "*"
 
 [dev-packages]
 

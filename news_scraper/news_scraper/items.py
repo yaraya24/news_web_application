@@ -7,8 +7,8 @@ import scrapy
 
 
 class NewsScraperItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
+    """Class that defines the item passed to the pipeline"""
+    
     source = scrapy.Field()
     heading = scrapy.Field()
     article_address = scrapy.Field()

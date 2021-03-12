@@ -11,6 +11,7 @@ from news.models import NewsArticle, NewsOrganisation, Category
 
 
 class NewsScraperPipeline:
+    """Class that will pass the items if they qualify to the Postgres database"""
     def process_item(self, item, spider):
         
         

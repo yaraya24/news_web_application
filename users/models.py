@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from news.models import NewsOrganisation, NewsArticle, Category
 
 class CustomUser(AbstractUser):
+    """Custom user model with relationships"""
     follow_news_org = models.ManyToManyField(NewsOrganisation, related_name='followed_by')
     likes = models.ManyToManyField(NewsArticle, related_name="likes")
     saves = models.ManyToManyField(NewsArticle, related_name='saves')

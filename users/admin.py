@@ -7,6 +7,7 @@ from .forms import CustomUserChangeForm, CustomUserCreationForm
 CustomUser = get_user_model()
 
 class CustomUserAdmin(UserAdmin):
+    """Allows for user model to be edited from admin page"""
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser

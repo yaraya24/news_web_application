@@ -3,6 +3,7 @@ from scrapy.selector import Selector
 from news_scraper.items import NewsScraperItem
 
 class NPRSpider(Spider):
+    """ Spider that will scrape for articles from NPR"""
     name = 'npr_spider'
 
     start_urls = [
@@ -15,6 +16,7 @@ class NPRSpider(Spider):
     }
 
     def parse(self, response):
+        """Method to parse articles using Xpaths"""
         articles = Selector(response).xpath('//h2[@class="title"]')
 
         category = {
@@ -28,6 +30,7 @@ class NPRSpider(Spider):
             yield Request(url, callback = self.npr_article, meta={'category': category[response.url]})
 
     def npr_article(self, response):
+        """Call back method to create a News Article object based on scraped data"""
         item = NewsScraperItem()
         item['source'] = 'NPR'
         item['category'] = response.meta.get('category')
