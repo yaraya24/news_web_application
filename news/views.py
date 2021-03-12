@@ -8,11 +8,13 @@ from .models import NewsArticle, NewsOrganisation, Category
 from .serializers import ArticleSerializer, ProfilePageSerializer
 from .permissions import IsAuthorizedUser
 
+
 class ArticlesList(generics.ListAPIView):
     """Generic ListAPI view to display all general news articles
     with no permission restrictions."""
+
     serializer_class = ArticleSerializer
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.AllowAny,)
 
     def get_queryset(self):
         """Custom queryset to retrive only News Articles that have the General category"""
@@ -22,6 +24,7 @@ class ArticlesList(generics.ListAPIView):
 
 class ArticleDetailView(generics.RetrieveUpdateAPIView):
     """Detailed view for a news article"""
+
     permission_classes = (permissions.IsAuthenticated,)
     queryset = NewsArticle.objects.all()
     serializer_class = ArticleSerializer
@@ -54,13 +57,14 @@ class ArticleDetailView(generics.RetrieveUpdateAPIView):
 
 class ProfileView(generics.RetrieveUpdateAPIView):
     """Generic view that will display information about logged in user"""
+
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ProfilePageSerializer
 
     def get_object(self):
         """
         Returns the object the view is displaying.
-         
+
         """
         obj = get_object_or_404(get_user_model(), username=self.request.user.username)
 
@@ -103,6 +107,7 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
 class SavedArticles(generics.ListAPIView):
     """Generic view to display all saved articles by the user"""
+
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ArticleSerializer
 
@@ -113,13 +118,14 @@ class SavedArticles(generics.ListAPIView):
 
 class SavedArticleDetail(generics.RetrieveDestroyAPIView):
     """Class to remove articles from being saved"""
+
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ArticleSerializer
 
     def get_object(self):
         """
         Returns the object the view is displaying.
-        
+
         """
         queryset = self.request.user.saves.all()
 
@@ -155,6 +161,7 @@ class SavedArticleDetail(generics.RetrieveDestroyAPIView):
 
 class UserFeed(generics.ListAPIView):
     """Class to retrieve all articles based on followed categories and news orgs"""
+
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = ArticleSerializer
 
@@ -174,42 +181,53 @@ class UserFeed(generics.ListAPIView):
 
         return queryset
 
+
 class SportsView(generics.ListAPIView):
     """Generic ListAPI view to display all sports news articles"""
+
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
         category = Category.objects.filter(name="Sports").first()
         return NewsArticle.objects.filter(category=category).order_by("-published_date")
 
+
 class BusinessView(generics.ListAPIView):
     """Generic ListAPI view to display all business news articles"""
+
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
         category = Category.objects.filter(name="Business").first()
         return NewsArticle.objects.filter(category=category).order_by("-published_date")
 
+
 class CultureView(generics.ListAPIView):
     """Generic ListAPI view to display all culture news articles"""
+
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
         category = Category.objects.filter(name="Culture").first()
         return NewsArticle.objects.filter(category=category).order_by("-published_date")
 
+
 class TechnologyView(generics.ListAPIView):
     """Generic ListAPI view to display all technology news articles"""
+
     serializer_class = ArticleSerializer
 
     def get_queryset(self):
         category = Category.objects.filter(name="Technology").first()
         return NewsArticle.objects.filter(category=category).order_by("-published_date")
 
+
 class SearchView(generics.ListAPIView):
     """Generic ListAPI view to display news articles that match the search query"""
-    serializer_class = ArticleSerializer
-    filter_backends = [filters.SearchFilter,]
-    search_fields = ['heading', 'snippet', 'author']
-    queryset = NewsArticle.objects.all()
 
+    serializer_class = ArticleSerializer
+    filter_backends = [
+        filters.SearchFilter,
+    ]
+    search_fields = ["heading", "snippet", "author"]
+    queryset = NewsArticle.objects.all()

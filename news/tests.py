@@ -1,9 +1,6 @@
 import json
 from django.test import TestCase
 from django.urls import reverse, resolve
-
-from .views import HomePageView
-
 from .models import NewsArticle, NewsOrganisation, Category
 from django.contrib.auth import get_user_model, get_user
 from rest_framework.test import APIClient, force_authenticate, APIRequestFactory
@@ -31,7 +28,7 @@ class ArticleListTests(TestCase):
         )
         self.news1.save()
 
-        self.category = Category.objects.create(name="Politics")
+        self.category = Category.objects.create(name="General")
         self.category.save()
 
         self.article1 = NewsArticle.objects.create(
@@ -65,7 +62,7 @@ class ArticleListTests(TestCase):
         self.assertEqual(test_article.snippet, "test article as seen on test news1")
         self.assertEqual(test_article.author, "journalist1")
         self.assertEqual(test_article.image_source, "image.com")
-        self.assertEqual(test_article.category.name, "Politics")
+        self.assertEqual(test_article.category.name, "General")
         self.assertEqual(
             test_article.likes.filter(username="test_user").first(), self.test_user
         )
@@ -121,7 +118,7 @@ class ArticleListTests(TestCase):
         request = self.factory.get("/api/v1/profile")
         response = view(request)
         response.render()
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
         request = self.factory.get("/api/v1/profile/")
         force_authenticate(request, user=self.test_user)
@@ -246,13 +243,13 @@ class ArticleListTests(TestCase):
         self.test_user.follow_category.add(self.category)
         self.assertEqual(self.test_user.follow_category.count(), 1)
         self.assertEqual(
-            self.test_user.follow_category.filter(name="Politics").first(),
+            self.test_user.follow_category.filter(name="General").first(),
             self.category,
         )
         self.test_user.follow_category.remove(self.category)
         self.assertEqual(self.test_user.follow_category.count(), 0)
         self.assertFalse(
-            self.test_user.follow_category.filter(name="Politics").first(),
+            self.test_user.follow_category.filter(name="General").first(),
             self.category,
         )
 
@@ -274,7 +271,7 @@ class ArticleListTests(TestCase):
         )
         self.assertEqual(self.test_user.follow_category.count(), 1)
         self.assertEqual(
-            self.test_user.follow_category.filter(name="Politics").first(),
+            self.test_user.follow_category.filter(name="General").first(),
             self.category,
         )
 
@@ -289,7 +286,7 @@ class ArticleListTests(TestCase):
         self.assertEqual(len(view_response["follow_category_list"]), 0)
         self.assertEqual(self.test_user.follow_category.count(), 0)
         self.assertFalse(
-            self.test_user.follow_category.filter(name="Politics").first(),
+            self.test_user.follow_category.filter(name="General").first(),
             self.category,
         )
 
@@ -314,4 +311,4 @@ class ArticleListTests(TestCase):
         self.test_user.follow_category.add(category2)
         view_response = self.method_for_testing_views(UserFeed, "/api/v1/myfeed")
         self.assertEqual(len(view_response['results']), 2)
-        self.assertEqual(view_response['results'][1]["heading"], article2.heading)
+        self.assertEqual(view_response['results'][0]["heading"], article2.heading)

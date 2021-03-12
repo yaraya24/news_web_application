@@ -16,7 +16,7 @@ class ReutersSpider(Spider):
     custom_settings = {"DEPTH_LIMIT": 2}
 
     def parse(self, response):
-         """Method to parse articles using Xpaths"""
+        """Method to parse articles using Xpaths"""
         articles = Selector(response).xpath('//div[@class="story-content"]')
         category = {
             "https://www.reuters.com/": "General",

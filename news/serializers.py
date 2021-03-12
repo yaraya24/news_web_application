@@ -48,7 +48,7 @@ class ArticleSerializer(serializers.ModelSerializer):
             return None
 
     def get_saved_by_user(self, obj):
-         """Custom serializer method to determine if logged in user has saved a particular article"""
+        """Custom serializer method to determine if logged in user has saved a particular article"""
         request = self.context.get("request", None)
         if request:
             user = request.user
@@ -61,7 +61,7 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 
 class ProfilePageFollowedNews(serializers.ModelSerializer):
-     """Serializer to show News Organisations name instead of id for the profile endpoint"""
+    """Serializer to show News Organisations name instead of id for the profile endpoint"""
     class Meta:
         model = NewsOrganisation
         fields = ["name"]
